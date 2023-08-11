@@ -41,8 +41,14 @@ parser.add_argument(
 parser.add_argument(
     "-s",
     "--sources-list",
-    help="Select a sources file stored at /etc/dpkg-buildenv/apt/sources.list.d/<SOURCE>.list ",
+    help="Select a sources file stored at /etc/dpkg-buildenv/apt/sources.list.d/<SOURCE>.list",
     default="default",
+)
+parser.add_argument(
+    "-lp",
+    "--local-packages",
+    help="Select a local directory containing debian packages you want install",
+    nargs="?",
 )
 args = parser.parse_args()
 
@@ -78,6 +84,26 @@ def copy_sources_list():
     if not os.path.isfile(source_file):
         sys.exit(f"Source file does not exist: {source_file}")
 
+    copy_cmd = f"mkdir --parents {target_dir} && cp {source_file} {target_dir}"
+    logging.info(f"Copy command: {copy_cmd}")
+    subprocess.run(copy_cmd, shell=True, check=True)
+
+
+def setup_local_apt_repository(source_dir):
+
+    # Copy .debs to repo (so docker can access them)
+    target_dir = "./dpkg-buildenv/input_packages/"
+    copy_cmd = f"mkdir --parents {target_dir} && cp {source_dir} {target_dir}"
+    subprocess.run(copy_cmd, shell=True, check=True)
+
+    # Generate Packges.gz file apt needs
+    scan_cmd = "dpkg-scanpackages . /dev/null | gzip --fast --stdout > Packages.gz"
+    logging.info(f"Scan command: {scan_cmd}")
+    subprocess.run(scan_cmd, shell=True, check=True, cwd=target_dir)
+
+    # Copy local.list which tells apt to look locally for files
+    source_file = "/etc/dpkg-buildenv/sources.list.d/local.list"
+    target_dir = "./dpkg-buildenv/sources.list.d/"
     copy_cmd = f"mkdir --parents {target_dir} && cp {source_file} {target_dir}"
     logging.info(f"Copy command: {copy_cmd}")
     subprocess.run(copy_cmd, shell=True, check=True)
@@ -145,6 +171,8 @@ if __name__ == "__main__":
         delete_images()
         sys.exit()
     repository_name = get_repository_name()
+    if args.local_packages is not None:
+        setup_local_apt_repository(args.local_packages)
     copy_sources_list()
     build_image(repository_name)
     run_container(repository_name)

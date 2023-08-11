@@ -56,3 +56,20 @@ class Test:
             self.cli_commands.pop()
             == "docker run --mount type=bind,src=${PWD},dst=/workspaces/code --user $(id -u):$(id -g) --network host --rm --interactive --tty test_name "
         )
+
+    def test_setup_local_apt_repository(self):
+        uut.setup_local_apt_repository("./made/up/path")
+        assert (
+            self.cli_commands.pop(0)
+            == "mkdir --parents ./dpkg-buildenv/input_packages/ && cp ./made/up/path ./dpkg-buildenv/input_packages/"
+        )
+
+        assert (
+            self.cli_commands.pop(0)
+            == "dpkg-scanpackages . /dev/null | gzip --fast --stdout > Packages.gz"
+        )
+
+        assert (
+            self.cli_commands.pop(0)
+            == "mkdir --parents ./dpkg-buildenv/sources.list.d/ && cp /etc/dpkg-buildenv/sources.list.d/local.list ./dpkg-buildenv/sources.list.d/"
+        )
