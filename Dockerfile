@@ -1,4 +1,4 @@
-FROM debian:11
+FROM debian:12
 USER root
 
 # Prevent apt from asking the user questions like which time zone.
@@ -55,8 +55,7 @@ COPY ./dpkg-buildenv/sources.list.d/ /etc/apt/sources.list.d/
 # Install application's build/packaging dependencies.
 # Remove generated files.
 RUN apt-get update && \
-    mk-build-deps --install --remove --tool='apt-get --yes --fix-missing --no-install-recommends -o Debug::pkgProblemResolver=yes' /tmp/control && \
-    rm *.buildinfo *.changes /tmp/control
+    mk-build-deps --install --remove --tool='apt-get --yes --fix-missing --no-install-recommends -o Debug::pkgProblemResolver=yes' /tmp/control
 # ---------------------------------------------------------------------------- #
 
 
