@@ -7,6 +7,6 @@ Standards-Version: 4.5.1
 
 Package: dpkg-buildenv
 Architecture: all
-Depends: docker.io, python3, ${misc:Depends}
+Depends: docker.io | docker-ce, python3, ${misc:Depends}
 Description: Builds debian packages in a docker container.
  Invoke without any arguments to simply build packages.
