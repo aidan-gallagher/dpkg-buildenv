@@ -46,6 +46,9 @@ RUN apt-get update && \
 COPY ./debian/control ./developer-packages.tx[t] /tmp/
 # ---------------------------------------------------------------------------- #
 
+RUN --mount=type=bind,source=/extra-pkgs,target=/tmp/extra-pkgs \
+    dpkg -i /tmp/extra-pkgs/*.deb; exit 0
+RUN apt-get install -f -y 
 
 # --------------------- Copy additional apt sources files -------------------- #
 COPY ./dpkg-buildenv/sources.list.d/ /etc/apt/sources.list.d/
