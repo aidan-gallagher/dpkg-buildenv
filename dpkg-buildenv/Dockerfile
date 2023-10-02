@@ -44,9 +44,9 @@ RUN echo 'alias mv-debs="mkdir --parents ./built_packages;  mv ../*.deb ./built_
 # ---------------------------------------------------------------------------- #
 
 
-# ---------------------- Install mk-build-deps and gdebi --------------------- #
+# --------------------------- Install mk-build-deps -------------------------- #
 RUN apt-get update && \
-    apt-get install --yes --fix-missing --no-install-recommends devscripts equivs gdebi-core
+    apt-get install --yes --fix-missing --no-install-recommends devscripts equivs
 # ---------------------------------------------------------------------------- #
 
 
@@ -65,9 +65,9 @@ RUN echo "$ADDITIONAL_SOURCES" > /etc/apt/sources.list.d/dpkg-buildenv.sources
 # ---------------------------------------------------------------------------- #
 
 
-# ----------------------- Install local debian packages ---------------------- #
-# The "+" returns an error code on failure (https://apple.stackexchange.com/a/337961)
-RUN find /tmp -name '*.deb' -exec gdebi --non-interactive {} +
+# ---------------------------- Add local apt repo ---------------------------- #
+RUN dpkg-scanpackages /tmp > /tmp/Packages && \
+    echo "deb [trusted=yes] file:///tmp ./" > /etc/apt/sources.list.d/local.list
 # ---------------------------------------------------------------------------- #
 
 
