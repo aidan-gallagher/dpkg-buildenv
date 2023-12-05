@@ -5,3 +5,8 @@
 
 %:
 	dh $@
+
+# Add a rule to convert Markdown to man
+override_dh_auto_build:
+	dh_auto_build
+	pandoc --standalone --to man dpkg-buildenv/Documentation/dpkg-buildenv.manpage.md -o debian/dpkg-buildenv.1

@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "-nc",
     "--no-cache",
-    help="Do not use cache when building the image. [Docker build argument]",
+    help="Do not use cache when building the image.",
     action="store_const",
     default="",
     const="--no-cache",
@@ -40,14 +40,14 @@ exclusive_group_parser = parser.add_mutually_exclusive_group()
 exclusive_group_parser.add_argument(
     "-i",
     "--interactive",
-    help="Open an interactive terminal to the container. [Docker run argument]",
+    help="Open an interactive terminal to the container.",
     action="store_const",
     default="",
     const="--interactive",
 )
 exclusive_group_parser.add_argument(
     "command",
-    help="Command to execute in the container. [Docker run argument]",
+    help="Command to execute in the container.",
     nargs="?",
     default="",
 )
