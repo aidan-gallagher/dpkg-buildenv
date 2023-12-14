@@ -13,7 +13,8 @@ logging.basicConfig(level=logging.INFO)
 #                                    Common                                    #
 # ---------------------------------------------------------------------------- #
 def run(cmd: str, capture_output=True) -> str:
-    logging.info(f"Running command:{cmd}")
+    if capture_output == False:
+        logging.info(f"Running command:{cmd}")
     return subprocess.run(
         cmd, shell=True, text=True, capture_output=capture_output, check=True
     ).stdout
@@ -44,12 +45,12 @@ newgrp docker"""
 
 
 def delete_images():
-    find_cmd = "docker images '*buildenv' --format {{.Repository}}"
-    find_result = run(find_cmd).replace("\n", " ")
+    find_result = run("docker images '*buildenv' --format {{.Repository}}").replace(
+        "\n", " "
+    )
 
     if find_result != "":
-        delete_cmd = f"docker rmi {find_result}; docker image prune --force"
-        run(delete_cmd)
+        run(f"docker rmi {find_result}; docker image prune --force")
     else:
         logging.info("No images to delete")
 
