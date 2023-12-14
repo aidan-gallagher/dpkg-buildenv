@@ -2,6 +2,9 @@ import subprocess
 import dpkg_buildenv as uut
 
 
+# main(["--no-cache"])
+
+
 class Test:
     def setup_method(self, test_method):
         # This method is called before every test_* function.
@@ -35,8 +38,7 @@ class Test:
             == "DOCKER_BUILDKIT=1 docker image build --tag test_name --file /usr/share/dpkg-buildenv/Dockerfile --network host   ."
         )
 
-        uut.args.no_cache = "--no-cache"
-        uut.build_image("test_name")
+        uut.build_image("test_name", "--no-cache")
         assert (
             self.cli_commands.pop(0)
             == "DOCKER_BUILDKIT=1 docker image build --tag test_name --file /usr/share/dpkg-buildenv/Dockerfile --network host --no-cache  ."
@@ -49,15 +51,13 @@ class Test:
             == "docker run --mount type=bind,src=${PWD},dst=/workspaces/code --user 1000:$(id -g 1000) --network host --tty --rm --env DEB_BUILD_OPTIONS=  test_name /bin/bash -c 'dpkg-buildpackage && mv-debs && dpkg-buildpackage --target=clean'"
         )
 
-        uut.args.command = "echo I'm a test command"
-        uut.run_container("test_name")
+        uut.run_container("test_name", "echo I'm a test command")
         assert (
             self.cli_commands.pop(0)
             == "docker run --mount type=bind,src=${PWD},dst=/workspaces/code --user 1000:$(id -g 1000) --network host --tty --rm --env DEB_BUILD_OPTIONS=  test_name /bin/bash -c 'echo I'm a test command'"
         )
 
-        uut.args.interactive = "--interactive"
-        uut.run_container("test_name")
+        uut.run_container("test_name", "", "--interactive")
         assert (
             self.cli_commands.pop(0)
             == "docker run --mount type=bind,src=${PWD},dst=/workspaces/code --user 1000:$(id -g 1000) --network host --tty --rm --env DEB_BUILD_OPTIONS= --interactive test_name "
