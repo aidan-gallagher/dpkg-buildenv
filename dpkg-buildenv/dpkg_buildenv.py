@@ -51,12 +51,11 @@ def delete_images():
         logging.info("No images to delete")
 
 
-def get_repository_name() -> str:
+def generate_image_name() -> str:
     path = os.getcwd()
     directories = os.path.split(path)
-    repository_name = directories[-1].lower() + "-buildenv"
-    logging.info(f"Creating image: {repository_name}")
-    return repository_name
+    image_name = directories[-1].lower() + "-buildenv"
+    return image_name
 
 
 def get_uid() -> int:
@@ -76,10 +75,10 @@ def get_build_arguments(distribution: str, sources: str) -> str:
 
     build_args = ""
 
-    # User ID
+    # ---------------------------------- UserID ---------------------------------- #
     build_args += f'--build-arg UID="{get_uid()}"'
 
-    # Additional sources
+    # ---------------------------------- Sources --------------------------------- #
     try:
         with open(f"/etc/dpkg-buildenv/sources.list.d/{sources}.sources") as file:
             additional_sources = file.read().replace("\n", "\\n")
@@ -87,6 +86,7 @@ def get_build_arguments(distribution: str, sources: str) -> str:
     except FileNotFoundError:
         pass
 
+    # ------------------------------- Distribution ------------------------------- #
     if distribution:
         build_args += f" --build-arg DISTRIBUTION={distribution}"
 
@@ -268,7 +268,7 @@ def main(argv: List[str]):
             sys.exit()
 
         prerequisite_check()
-        repository_name = get_repository_name()
+        repository_name = generate_image_name()
         build_image(repository_name, args.no_cache, build_arguments)
         run_container(repository_name, args.command, args.interactive)
 
