@@ -84,7 +84,11 @@ def get_build_arguments(distribution: str, sources: str) -> str:
             additional_sources = file.read().replace("\n", "\\n")
             build_args += f' --build-arg ADDITIONAL_SOURCES="{additional_sources}"'
     except FileNotFoundError:
-        pass
+        if sources != "default":
+            print(
+                f"Error file not found: /etc/dpkg-buildenv/sources.list.d/{sources}.sources"
+            )
+            exit(-1)
 
     # ------------------------------- Distribution ------------------------------- #
     if distribution:
